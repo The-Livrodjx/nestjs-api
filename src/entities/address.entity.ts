@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
+import { User } from "./user.entity";
 
 @Entity()
 export class Address {
@@ -11,4 +12,7 @@ export class Address {
 
     @Column()
     contact: string
+
+    @ManyToOne(() => User, user => user.address, {cascade: true})
+    user: User
 }

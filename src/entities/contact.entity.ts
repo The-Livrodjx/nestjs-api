@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToOne } from "typeorm";
+import { User } from "./user.entity";
 
 @Entity()
 export class Contacts {
@@ -17,4 +18,7 @@ export class Contacts {
 
     @Column()
     zipCode: string
+
+    @ManyToOne(() => User, user => user.contacts, {cascade: true})
+    user: User
 }

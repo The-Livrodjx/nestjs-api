@@ -10,18 +10,11 @@ export class UserController {
   create(@Body() body: Body) {
     return this.userService.create(body);
   }
-
+  
   @Get()
   findAll() {
     return this.userService.findAll();
   }
-
-  @Get("/livrodjx")
-  hello() {
-
-    return this.userService.hello();
-  }
-
 
   @Get(':id')
   findOne(@Param('id') id: string) {

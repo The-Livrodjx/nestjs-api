@@ -1,4 +1,5 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToMany, JoinColumn} from 'typeorm'
+import {Entity, PrimaryGeneratedColumn, Column, OneToMany, BeforeInsert} from 'typeorm'
+import bcrypt from 'bcrypt'
 import { Address } from './address.entity'
 import { Contacts } from './contact.entity'
 
@@ -11,17 +12,21 @@ export class User {
     @Column()
     name: string
 
-    @Column()
+    @Column({unique: true})
     email: string
 
-    @Column()
+    @Column({select: false})
     password: string
 
-    @OneToMany(() => Address, address => address.id)
-    @JoinColumn({name: "address_id"})
+    @OneToMany(() => Address, address => address.user, {cascade: ["insert","update",]})
     address: Address[]
 
-    @OneToMany(() => Contacts, contact => contact.id)
-    @JoinColumn({name: "contact_id"})
+    @OneToMany(() => Contacts, contact => contact.user, {cascade: ["insert","update",]})
     contacts: Contacts[]
+
+    @BeforeInsert() genHash() {
+
+        this.password = bcrypt.hashSync(this.password, 10)
+    }
+
 }
