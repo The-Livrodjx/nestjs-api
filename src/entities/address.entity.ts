@@ -1,18 +1,23 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
-import { User } from "./user.entity";
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { User } from './user.entity';
 
 @Entity()
 export class Address {
+  @PrimaryGeneratedColumn()
+  id: string;
 
-    @PrimaryGeneratedColumn()
-    id: string
+  @Column()
+  street: string;
 
-    @Column()
-    type: string
+  @Column()
+  city: string;
 
-    @Column()
-    contact: string
+  @Column()
+  state: string;
 
-    @ManyToOne(() => User, user => user.address, {cascade: true})
-    user: User
+  @Column()
+  zipCode: string;
+
+  @ManyToOne(() => User, (user) => user.contacts, { cascade: true })
+  user: User;
 }
