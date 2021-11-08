@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/entities/user.entity';
 import { Repository } from 'typeorm';
 import {hashSync} from 'bcrypt'
+import { Address } from 'src/entities/address.entity';
 
 @Injectable()
 export class UserService {
@@ -42,11 +43,91 @@ export class UserService {
     }
   }
 
-  update(id: number) {
-    return `This action updates a #${id} user`;
+  async update(body) {
+    
+    const {id, email, username} = body
+
+    if(email !== "" && username !== "") {
+
+      const properties = await this.usersRepository.findOne({where: {id}})
+
+      const newUser = await this.usersRepository.save({
+        ...properties,
+        id,
+        email,
+        name: username
+      })
+
+      return newUser
+    }
+
+    else {
+      throw new HttpException('Por favor insira informações', 406)
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string, entity: string) {
+    this.usersRepository
+      .createQueryBuilder()
+      .delete()
+      .from(entity)
+      .where("userId = :id", {id})
+      .execute()
   }
+
+  async createAddress(body) {
+    body = body.body
+    let id = body.id
+    let user = await this.usersRepository.findOne({where: {id}, relations: ['address']})
+    
+    if(user) {
+
+      delete body.id
+
+      user.address.push(body)
+      let newAddress = await this.usersRepository.save(user)
+
+      return newAddress
+    }
+
+  }
+
+  async excludeAddress(userId: string, addressid: string) {
+     
+    let user = await this.usersRepository.findOne({where: {id: userId}, relations: ['address']})
+    
+    let newAddressArray = user.address.filter(address => address.id != addressid)
+    user.address = newAddressArray
+
+    return this.usersRepository.save(user)
+  }
+
+  async createContacts(body) {
+    // body = body.body
+
+    // return body
+    let id = body.id
+    let user = await this.usersRepository.findOne({where: {id}, relations: ['contacts']})
+    
+    if(user) {
+
+      delete body.id
+
+      user.contacts.push(body)
+      let newContact = await this.usersRepository.save(user)
+
+      return newContact
+    }
+  }
+
+  async excludeContact(userId: string, contactId: string) {
+     
+    let user = await this.usersRepository.findOne({where: {id: userId}, relations: ['contacts']})
+    
+    let newContactsArray = user.contacts.filter(contact => contact.id != contactId)
+    user.contacts = newContactsArray
+
+    return this.usersRepository.save(user)
+  }
+
 }
